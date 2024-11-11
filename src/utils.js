@@ -35,6 +35,7 @@ function fakeUser() {
 async function upsert(data){
   let record = await prisma.listings.findFirst({ where: {source: data.source, thirdPartyId: data.thirdPartyId} })
   if(record){
+    delete data.id
     record = await prisma.listings.update({
       where: {
         id: record.id
@@ -81,6 +82,38 @@ async function fetchWithRetries(url, retries = 3) {
   }
 }
 
-module.exports = { visited, delay, download, fetchWithRetries, upsert, fakeUser }
+// make strings into numbers mostly
+
+const intFields = [
+  "cashFlow",
+  "revenue",
+  "employees",
+  "ffAndE",
+  "netProfit",
+  "realEstate",
+  "totalDebt",
+  "yearEstablished",
+  "minimumInvestment",
+  "netWorthRequired",
+  "franchiseFee",
+  "existingUnits",
+
+]
+
+function sanitize(data){
+  let ret = {}
+  for (let key of Object.keys(data)) {
+    if (data[key] === "Not Disclosed") {
+      ret[key] = null
+    } else if (!intFields.includes(key)) {
+      ret[key] = data[key]
+    } else if (typeof data[key] === "string" && data[key].match(/^\$?\d[\d.,]*$/)) {
+      ret[key] = Number(data[key].replace(/[^\d.]/g, ''))
+    }
+  }
+  return ret
+}
+
+module.exports = { visited, delay, download, fetchWithRetries, upsert, fakeUser, sanitize }
 
 // npm i -s csv-write-stream csvtojson

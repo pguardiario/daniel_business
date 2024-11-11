@@ -29,11 +29,8 @@ model listings {
   url             String
   source          String
   industry        String?
-  isLeased        Boolean?
-  isHomebased     Boolean?
-  isFranchise     Boolean?
-  bbnNumber       Int?
-  brokerNumber    Int?
+  bbnNumber       String?
+  brokerNumber    String?
   employees       Int?
   ffAndE          Int?
   netProfit       Int?
@@ -41,6 +38,7 @@ model listings {
   totalDebt       Int?
   yearEstablished Int?
 
+  logo String?
   image String?
   financingAssistance String?
   minimumInvestment   Int?
@@ -49,9 +47,9 @@ model listings {
 
   netWorthRequired Int?
   franchiseFee     Int?
-  existingUnits    String?
+  existingUnits    Int?
 
-  reasinForSelling String?
+  reasonForSelling String?
   additionalDetails String?
 
   createdAt DateTime

@@ -1,4 +1,4 @@
-const { upsert, delay, fakeUser } = require('./utils')
+const { upsert, delay, fakeUser, sanitize } = require('./utils')
 const cheerio = require('cheerio')
 const puppeteer = require('puppeteer')
 
@@ -38,7 +38,7 @@ async function addDetails(record) {
   // let isFranchise = !!str.match('is a franchise')
 
   let props = $('.quickFacts td:nth-child(2)').get().reduce((acc, el) => {
-    let key = $(el).text().trim().replace(':')
+    let key = $(el).text().trim().replace(':', '')
     let value = $(el).next().text().trim()
     acc[key] = value
     return acc
@@ -70,17 +70,16 @@ async function addDetails(record) {
   let franchiseFee = props["Franchise Fee"]
   let existingUnits = props["# of Existing Units"]
 
-  let reasinForSelling = $('h3:contains(Reason for Selling)').get().pop()?.nextSibling.data.trim()
+  let reasonForSelling = $('h3:contains(Reason for Selling)').get().pop()?.nextSibling.data.trim()
   let additionalDetails = $('.additionalDetails li').get().map(x => $(x).text()).join('|')
 
-  if($('.item1.listing')[0]){
-    debugger
-  }
+  // let logo = $('.item1.listing [style*=background]').attr('style')?.match(/'(.*)'/)?.pop()
 
   let image = $('#profile_banner img').attr('data-src')
 
   let data = {
     image,
+    // logo,
     industry,
     // isLeased,
     // isHomebased,
@@ -100,19 +99,15 @@ async function addDetails(record) {
     netWorthRequired,
     franchiseFee,
     existingUnits,
-    reasinForSelling,
+    reasonForSelling,
     additionalDetails,
   }
 
 
   // sanitize these values
-  for (let key of Object.keys(data)) {
-    if (data[key] === "Not Disclosed") {
-      data[key] = null
-    } else if (typeof data[key] === "string" && data[key].match(/^\$?\d[\d.,]*$/)) {
-      data[key] = Number(data[key].replace(/[^\d.]/g, ''))
-    }
-  }
+  data = sanitize(data)
+
+
 
   let x = await upsert({ ...record, ...data })
   // debugger
@@ -156,7 +151,9 @@ async function run() {
       let cashFlow = $(div).find('.financials span:contains("Cash Flow")').get().pop()?.nextSibling?.data.trim()
       let revenue = $(div).find('.financials span:contains("Revenue")').get().pop()?.nextSibling?.data.trim()
       let url = new URL($(div).find('.read a').attr('href'), "https://www.businessbroker.net").href
+      let logo = $(div).find('.concept-logo').attr('data-src')
 
+      name = name.replace(/\b(amp)+\b/g, 'and')
       revenue = revenue?.match(/^\$\d[\d,]+$/) ? Number(revenue.replace(/[^\d]/g, '')) : null
       cashFlow = cashFlow?.match(/^\$\d[\d,]+$/) ? Number(cashFlow.replace(/[^\d]/g, '')) : null
 
@@ -171,6 +168,7 @@ async function run() {
         cashFlow,
         revenue,
         url,
+        logo,
         source: 'businessbroker.net'
       }
 
