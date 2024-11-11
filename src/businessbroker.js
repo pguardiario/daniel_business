@@ -77,9 +77,10 @@ async function addDetails(record) {
     debugger
   }
 
-
+  let image = $('#profile_banner img').attr('data-src')
 
   let data = {
+    image,
     industry,
     // isLeased,
     // isHomebased,

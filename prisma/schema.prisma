@@ -41,6 +41,7 @@ model listings {
   totalDebt       Int?
   yearEstablished Int?
 
+  image String?
   financingAssistance String?
   minimumInvestment   Int?
   totalInvestment     String?
