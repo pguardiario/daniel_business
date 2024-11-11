@@ -16,19 +16,45 @@ datasource db {
 }
 
 model listings {
-  id        Int    @id @default(autoincrement())
-  name String
-  description String?
-  price Int
-  thirdPartyId String
-  county String?
-  city String?
-  state String?
-  cashFlow Int?
-  revenue Int?
-  url  String
-  source String
+  id              Int      @id @default(autoincrement())
+  name            String
+  description     String?
+  price           Int
+  thirdPartyId    String
+  county          String?
+  city            String?
+  state           String?
+  cashFlow        Int?
+  revenue         Int?
+  url             String
+  source          String
+  industry        String?
+  isLeased        Boolean?
+  isHomebased     Boolean?
+  isFranchise     Boolean?
+  bbnNumber       Int?
+  brokerNumber    Int?
+  employees       Int?
+  ffAndE          Int?
+  netProfit       Int?
+  realEstate      Int?
+  totalDebt       Int?
+  yearEstablished Int?
+
+  financingAssistance String?
+  minimumInvestment   Int?
+  totalInvestment     String?
+  trainingAndSupport  String?
+
+  netWorthRequired Int?
+  franchiseFee     Int?
+  existingUnits    String?
+
+  reasinForSelling String?
+  additionalDetails String?
+
   createdAt DateTime
   updatedAt DateTime
+
   @@unique([source, thirdPartyId])
 }
